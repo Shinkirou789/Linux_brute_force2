@@ -70,7 +70,7 @@ probar_contrasena() {
 
 export -f probar_contrasena
 
-
+export -f finalizar
 
 while IFS= read -r password; do
     echo -e "${AZUL}Probando contraseña: $password${RESET}"
@@ -80,10 +80,20 @@ while IFS= read -r password; do
 
         usuarios_restantes=$(grep -Fxv -f usuarios_exitosos.txt "$usuarios" >> usuarios_restantes.txt ; echo "usuarios_restantes.txt")
         respuesta=1
+
+        if [ "$(wc -l < usuarios_restantes.txt)" -eq 0 ]; then
+
+            echo -e "${AZUL}Todos los usuarios fueron encontrados${RESET}"
+
+            finalizar
+        fi
     fi
-    
+
     
     cat "$usuarios_restantes" | xargs -I {} -P "$hilos" bash -c "probar_contrasena '{}' '$password'"
+
+    
+
     
     if [ -s archivo.txt ]; then
         cat resultado.txt
